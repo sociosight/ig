@@ -1,3 +1,5 @@
+import os
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -12,6 +14,10 @@ from app.api.artifacts import (
 from app.api.executions import (
     router as execution_router,
 )
+
+from app.core.logging import configure_logging
+
+configure_logging()
 
 app = FastAPI(
     title="IG",
@@ -47,5 +53,9 @@ app.include_router(
 @app.get("/health")
 def health():
     return {
-        "status": "ok"
+        "status": "ok",
+        "queue_provider": os.getenv(
+            "JOB_QUEUE_PROVIDER",
+            "rq",
+        ),
     }

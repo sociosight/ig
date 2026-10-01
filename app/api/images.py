@@ -2,7 +2,10 @@ import logging
 
 from app.images.service import submit_image_generation
 from fastapi import APIRouter, HTTPException, Depends
+# FileResponse supports legacy local artifacts.
+# StreamingResponse supports provider-backed artifact content.
 from fastapi.responses import FileResponse
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy import select
 
@@ -10,6 +13,8 @@ from app.db.database import SessionLocal
 from app.db.models import ImageRequest, User
 from app.services.openai_images import OpenAIImageService
 from app.auth.dependencies import get_current_user
+from app.artifacts.service import get_artifact
+from app.artifacts.storage.provider import artifact_store
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -125,6 +130,46 @@ def get_image_content(
                 detail=f"Image is not available; status={image.status}",
             )
 
+        if image.artifact_id:
+            artifact = get_artifact(
+                image.artifact_id,
+                user_id=current_user.user_id,
+            )
+
+            if artifact is None:
+                raise HTTPException(
+                    status_code=404,
+                    detail="Artifact not found",
+                )
+
+            if not artifact_store.exists(
+                artifact.storage_uri
+            ):
+                raise HTTPException(
+                    status_code=404,
+                    detail="Artifact content is missing",
+                )
+
+            content = artifact_store.iter_bytes(
+                artifact.storage_uri
+            )
+
+            return StreamingResponse(
+                content,
+                media_type=(
+                    artifact.mime_type
+                    or "application/octet-stream"
+                ),
+                headers={
+                    "Content-Disposition": (
+                        f'inline; filename="'
+                        f'{artifact.filename or image.request_id}'
+                        f'"'
+                    )
+                },
+            )
+
+        # Legacy compatibility: serve from local storage if no artifact is present in blob storage
         if not image.filename:
             raise HTTPException(
                 status_code=404,

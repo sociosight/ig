@@ -1,15 +1,15 @@
+import logging
 import uuid
 
 from sqlalchemy import select
 
 from app.db.database import SessionLocal
 from app.db.models import Job
-from app.jobs.queue import JobQueue
-from app.jobs.rq_queue import RQJobQueue
+from app.jobs.provider import get_job_queue
 
+from app.core.logging import job_trace_enabled
 
-job_queue: JobQueue = RQJobQueue()
-
+logger = logging.getLogger(__name__)
 
 def create_job(
     capability: str,
@@ -31,10 +31,38 @@ def create_job(
         db.commit()
         db.refresh(job)
 
+        if job_trace_enabled():
+            logger.info(
+                "job.created job_id=%s capability=%s user_id=%s",
+                job.job_id,
+                job.capability,
+                job.user_id,
+            )
+
         try:
+            job_queue = get_job_queue()
+
+            if job_trace_enabled():
+                logger.info(
+                    "job.enqueue.start job_id=%s provider=%s",
+                    job.job_id,
+                    type(job_queue).__name__,
+                )
+
             job_queue.enqueue(job.job_id)
 
+            if job_trace_enabled():
+                logger.info(
+                    "job.enqueue.complete job_id=%s",
+                    job.job_id,
+                )
+
         except Exception as exc:
+            logger.exception(
+                "Failed to enqueue job %s",
+                job.job_id,
+            )
+
             job.status = "failed"
             job.error_message = (
                 f"Failed to enqueue job: {exc}"

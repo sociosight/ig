@@ -1,0 +1,36 @@
+[project]
+name = "ig-backend"
+version = "0.1.0"
+requires-python = ">=3.13,<3.15"
+
+dependencies = [
+    "fastapi==0.141.1",
+    "uvicorn==0.52.4",
+    "openai==3.5.0",
+    "python-dotenv==1.2.3",
+    "SQLAlchemy",
+    "PyMySQL",
+    "alembic",
+    "google-auth",
+    "pwdlib[argon2]",
+    "email-validator",
+    "psycopg[binary]",
+    "vercel-queue",
+    "vercel",
+]
+
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+exclude = [
+    "alembic*",
+    "frontend*",
+    "output*",
+]
+
+[[tool.vercel.subscribers]]
+entrypoint = "app.jobs.vercel_subscriber"

@@ -7,3 +7,10 @@ output/
 node_modules/
 dist/
 redis-data/
+.vercel
+.env*
+.dev-logs/
+build/
+ig_backend.egg-info/
+.agents/
+skills-lock.json

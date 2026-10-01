@@ -26,3 +26,6 @@ rq==2.12.0
 google-auth
 pwdlib[argon2]
 email-validator
+psycopg[binary]
+vercel-queue
+vercel
