@@ -1,0 +1,39 @@
+{
+  "services": {
+    "backend": {
+      "root": ".",
+      "framework": "fastapi",
+      "entrypoint": "app.main:app"
+    },
+    "frontend": {
+      "root": "frontend",
+      "framework": "vite"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/health",
+      "destination": {
+        "service": "backend"
+      }
+    },
+    {
+      "source": "/v1/(.*)",
+      "destination": {
+        "service": "backend"
+      }
+    },
+    {
+      "source": "/v2/(.*)",
+      "destination": {
+        "service": "backend"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "frontend"
+      }
+    }
+  ]
+}

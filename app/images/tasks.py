@@ -11,7 +11,16 @@ from app.jobs.result import HandlerResult
 
 import uuid
 
-image_provider = OpenAIImageService()
+image_provider = None
+_image_provider = None
+
+def get_image_provider():
+    global _image_provider
+
+    if _image_provider is None:
+        _image_provider = OpenAIImageService()
+
+    return _image_provider
 
 def execute_image_generation(input_data: dict) -> HandlerResult:
     request_id = input_data["request_id"]
@@ -37,6 +46,7 @@ def execute_image_generation(input_data: dict) -> HandlerResult:
         )
 
         try:
+            image_provider = get_image_provider()
             result = image_provider.generate(prompt)
 
             filename = (
@@ -97,6 +107,8 @@ def execute_image_generation(input_data: dict) -> HandlerResult:
             # back any partially-created artifact.
             image_record.status = "failed"
             db.commit()
+
+            raise
 
     finally:
         db.close()

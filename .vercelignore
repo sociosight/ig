@@ -1,0 +1,31 @@
+# Local runtime data
+db-data/
+redis-data/
+output/
+
+# Local/generated build artifacts
+build/
+*.egg-info/
+.dev-logs/
+
+# Local agent/tooling metadata
+.agents/
+skills-lock.json
+
+# Local environment files / secrets
+.env
+.env.*
+!.env.example
+
+# Local container/dev infrastructure
+compose.yaml
+compose.cloud.yaml
+Dockerfile
+
+# Python caches
+__pycache__/
+*.py[cod]
+
+# Node dependencies
+node_modules/
+frontend/node_modules/

@@ -1,0 +1,8 @@
+services:
+  ig:
+    environment:
+      DATABASE_URL: ${CLOUD_DATABASE_URL}
+
+  ig-worker:
+    environment:
+      DATABASE_URL: ${CLOUD_DATABASE_URL}
