@@ -17,6 +17,8 @@ dependencies = [
     "psycopg[binary]",
     "vercel-queue",
     "vercel",
+    "redis>=8.1,<9",
+    "rq>=2.12,<3",
 ]
 
 [build-system]
