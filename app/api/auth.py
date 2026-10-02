@@ -1,3 +1,5 @@
+import os
+
 from pydantic import BaseModel, EmailStr
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from sqlalchemy.orm import Session
@@ -51,6 +53,14 @@ def get_db():
     finally:
         db.close()
 
+def self_registration_enabled() -> bool:
+    return (
+        os.getenv(
+            "ALLOW_SELF_REGISTRATION",
+            "false",
+        ).lower()
+        in {"1", "true", "yes", "on"}
+    )
 
 @router.post(
     "/register",
@@ -60,6 +70,12 @@ def register(
     request: RegisterRequest,
     db: Session = Depends(get_db),
 ):
+    if not self_registration_enabled():
+        raise HTTPException(
+            status_code=403,
+            detail="Self-registration is disabled",
+        )
+
     email = request.email.lower()
 
     existing_user = get_user_by_email(

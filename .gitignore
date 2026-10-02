@@ -11,6 +11,6 @@ redis-data/
 .env*
 .dev-logs/
 build/
-ig_backend.egg-info/
+*.egg-info/
 .agents/
 skills-lock.json
