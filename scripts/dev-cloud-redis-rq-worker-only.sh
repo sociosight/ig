@@ -77,8 +77,7 @@ echo "  Database:          configured"
 #
 if command -v docker >/dev/null 2>&1; then
     if docker compose ps --services --status running 
-        2>/dev/null 
-        | grep -qx "ig-worker"; then
+        2>/dev/null | grep -qx "ig-worker"; then
 
         echo
         echo "Stopping legacy Docker ig-worker..."
