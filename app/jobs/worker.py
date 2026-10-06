@@ -12,7 +12,17 @@ from app.executions.service import (
     fail_execution,
 )
 
+from app.core.logging import configure_logging
+
+configure_logging()
+
+logger = logging.getLogger(__name__)
+
 def execute_job(job_id: str) -> None:
+    logger.info(
+        "job.worker.start job_id=%s",
+        job_id,
+    )
     db = SessionLocal()
     job = None
     execution = None
