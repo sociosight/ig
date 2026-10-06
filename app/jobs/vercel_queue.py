@@ -10,9 +10,7 @@ from vercel.queue import (
 TOPIC = "ig-jobs"
 
 def get_queue_client() -> QueueClient:
-    kwargs = {
-        "deployment": ALL_DEPLOYMENTS,
-    }
+    kwargs = {}
 
     if base_url := os.getenv("IG_QUEUE_BASE_URL"):
         kwargs["base_url"] = base_url
