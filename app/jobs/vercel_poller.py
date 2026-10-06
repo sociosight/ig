@@ -12,6 +12,21 @@ from app.jobs.vercel_subscriber import (
     process_job,
 )
 
+def get_queue_client() -> QueueClient:
+    kwargs = {
+        "deployment": ALL_DEPLOYMENTS,
+    }
+
+    if base_url := os.getenv("IG_QUEUE_BASE_URL"):
+        kwargs["base_url"] = base_url
+
+    if region := os.getenv("VERCEL_REGION"):
+        kwargs["region"] = region
+
+    if token := os.getenv("VERCEL_OIDC_TOKEN"):
+        kwargs["token"] = token
+
+    return QueueClient(**kwargs)
 
 async def main() -> None:
 #    await poll_and_handle(
@@ -20,12 +35,7 @@ async def main() -> None:
 #    )
 
     # Use QueueClient to poll and handle all deployments instead of a specific deployment ID
-    client = QueueClient(
-        base_url=os.environ["IG_QUEUE_BASE_URL"],
-        token=os.environ["VERCEL_OIDC_TOKEN"],
-        region=os.environ["VERCEL_REGION"],
-        deployment=ALL_DEPLOYMENTS,
-    )
+    client = get_queue_client()
 
     await client.poll_and_handle(
         process_job,
