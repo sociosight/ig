@@ -12,6 +12,7 @@ from app.executions.service import (
     fail_execution,
 )
 
+import logging
 from app.core.logging import configure_logging
 
 configure_logging()
@@ -57,7 +58,7 @@ def execute_job(job_id: str) -> None:
 
         handler = get_handler(job.capability)
 
-        result =handler(job.input_json)
+        result = handler(job.input_json)
 
         if result is not None:
             apply_execution_result(
