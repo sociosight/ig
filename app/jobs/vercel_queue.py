@@ -9,18 +9,26 @@ from vercel.queue import (
 
 TOPIC = "ig-jobs"
 
+def get_queue_client() -> QueueClient:
+    kwargs = {}
+
+    if base_url := os.getenv("IG_QUEUE_BASE_URL"):
+        kwargs["base_url"] = base_url
+
+    if region := os.getenv("VERCEL_REGION"):
+        kwargs["region"] = region
+
+    if token := os.getenv("VERCEL_OIDC_TOKEN"):
+        kwargs["token"] = token
+
+    return QueueClient(**kwargs)
 
 async def _enqueue(
     job_id: str,
 ) -> None:
     
     
-    client = QueueClient(
-        base_url=os.environ["IG_QUEUE_BASE_URL"],
-        token=os.environ["VERCEL_OIDC_TOKEN"],
-        region=os.getenv("VERCEL_REGION", "dev1"),
-        deployment=ALL_DEPLOYMENTS,
-    )
+    client = get_queue_client()
 
     await client.send(
         TOPIC,
