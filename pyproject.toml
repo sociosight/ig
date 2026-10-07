@@ -36,7 +36,3 @@ exclude = [
 
 [tool.vercel]
 entrypoint = "app.main:app"
-
-[[tool.vercel.subscribers]]
-entrypoint = "app.jobs.vercel_subscriber"
-topics = ["ig-jobs"]
